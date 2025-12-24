@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+  <title>❄️ Новогодняя Рулетка Удачи</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;600;700&display=swap');
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: linear-gradient(135deg, #0a0f1d, #151e2e);
+      color: #e0f0ff;
+      font-family: 'Comfortaa', cursive;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      position: relative;
+      padding: 10px;
+    }
+
+    .snow {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: -1;
+    }
+    .snowflake {
+      position: absolute;
+      background: white;
+      border-radius: 50%;
+      opacity: 0.7;
+      animation: fall linear infinite;
+    }
+    @keyframes fall {
+      to { transform: translateY(100vh) rotate(360deg); }
+    }
+
+    .container {
+      text-align: center;
+      z-index: 10;
+      padding: 15px;
+      max-width: 100%;
+    }
+
+    h1 {
+      font-size: 2.2rem;
+      margin: 10px 0;
+      color: #ffd700;
+      text-shadow: 0 0 10px rgba(255, 215, 0, 0.7);
+      line-height: 1.2;
+    }
+
+    .subtitle {
+      font-size: 1rem;
+      margin: 10px 0 5px;
+      color: #a9d6ff;
+    }
+
+    .jackpot {
+      font-size: 1.3rem;
+      margin: 10px 0 25px;
+      color: #ff416c;
+      font-weight: 700;
+      text-shadow: 0 0 8px rgba(255, 65, 108, 0.6);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.03); }
+    }
+
+    .wheel-container {
+      position: relative;
+      width: 280px;
+      height: 280px;
+      margin: 0 auto 25px;
+    }
+
+    .wheel {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      /* Градиент с "мелькающим золотом" (мистери-бокс визуально присутствует, но не является сектором) */
+      background: conic-gradient(
+        #ff416c, #ff4b2b, #ff9a2d, #ffd700,
+        #ff416c, #00c9ff, #0072ff, #7a28cb,
+        #ff416c  /* ← золотой оттенок мелькает, но не закреплён как приз */
+      );
+      position: relative;
+      box-shadow: 0 0 25px rgba(255, 215, 0, 0.4);
+      transition: transform 4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .wheel::before {
+      content: '';
+      position: absolute;
+      width: 30px;
+      height: 30px;
+      background: #fff;
+      border-radius: 50%;
+      z-index: 5;
+      box-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+    }
+
+    .pointer {
+      position: absolute;
+      top: -18px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 0;
+      height: 0;
+      border-left: 12px solid transparent;
+      border-right: 12px solid transparent;
+      border-top: 25px solid #ffd700;
+      z-index: 10;
+      filter: drop-shadow(0 2px 3px rgba(0,0,0,0.6));
+    }
+
+    .btn {
+      background: linear-gradient(to right, #ff416c, #ff4b2b);
+      color: white;
+      border: none;
+      padding: 14px 36px;
+      font-size: 1.25rem;
+      font-family: 'Comfortaa', cursive;
+      font-weight: 600;
+      border-radius: 50px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 5px 15px rgba(255, 75, 43, 0.4);
+      width: auto;
+      min-width: 200px;
+    }
+
+    .btn:hover:not(:disabled) {
+      transform: scale(1.04);
+      box-shadow: 0 7px 20px rgba(255, 75, 43, 0.6);
+    }
+
+    .btn:disabled {
+      background: #444;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    .result {
+      margin-top: 20px;
+      font-size: 1.4rem;
+      min-height: 50px;
+      font-weight: 700;
+      color: #ffd700;
+      text-shadow: 0 0 8px rgba(255, 215, 0, 0.7);
+      opacity: 0;
+      transition: opacity 0.5s;
+      padding: 0 10px;
+    }
+
+    .used {
+      color: #999;
+      font-size: 0.95rem;
+      margin-top: 15px;
+      padding: 0 10px;
+    }
+
+    .fireworks {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      opacity: 0;
+      z-index: 100;
+    }
+
+    /* Адаптация под маленькие экраны */
+    @media (max-width: 375px) {
+      h1 { font-size: 1.9rem; }
+      .jackpot { font-size: 1.15rem; }
+      .wheel-container { width: 250px; height: 250px; }
+      .btn { padding: 12px 30px; font-size: 1.15rem; }
+      .result { font-size: 1.25rem; }
+    }
+
+    @media (max-height: 600px) {
+      body { padding-top: 20px; }
+      .container { margin-top: -20px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="snow" id="snow"></div>
+  <div class="fireworks" id="fireworks"></div>
+
+  <div class="container">
+    <h1>❄️ Новогодняя Рулетка Удачи ❄️</h1>
+    <p class="subtitle">Крути один раз — получи подарок!</p>
+    <div class="jackpot">🔥 Главный приз — мистери-бокс за 70 000 ₽!<br>Кому повезёт?</div>
+
+    <div class="wheel-container">
+      <div class="pointer"></div>
+      <div class="wheel" id="wheel"></div>
+    </div>
+
+    <button class="btn" id="spinBtn">🎯 Крутить!</button>
+    <div class="result" id="result"></div>
+    <div class="used" id="usedMsg"></div>
+  </div>
+
+  <script>
+    // Призы (без сумм в тексте — только названия)
+    const prizes = [
+      "📱 Подарочный сертификат Ozon",
+      "☕ Подарок на Wildberries",
+      "🎧 Яндекс Плюс на месяц",
+      "🎮 Бонусы в Steam",
+      "🍕 Пицца в «Додо»",
+      "🍿 Доступ в Кинопоиск HD",
+      "🎵 Месяц Spotify Premium",
+      "📱 Подарок в Google Play"
+    ];
+
+    const wheel = document.getElementById('wheel');
+    const spinBtn = document.getElementById('spinBtn');
+    const resultEl = document.getElementById('result');
+    const usedMsg = document.getElementById('usedMsg');
+    const fireworksEl = document.getElementById('fireworks');
+
+    // Снег
+    const snowContainer = document.getElementById('snow');
+    for (let i = 0; i < 60; i++) {
+      const flake = document.createElement('div');
+      flake.className = 'snowflake';
+      flake.style.left = `${Math.random() * 100}%`;
+      flake.style.width = `${Math.random() * 5 + 2}px`;
+      flake.style.height = flake.style.width;
+      flake.style.animationDuration = `${Math.random() * 5 + 4}s`;
+      flake.style.opacity = Math.random() * 0.5 + 0.2;
+      snowContainer.appendChild(flake);
+    }
+
+    // Проверка: уже крутил?
+    if (localStorage.getItem('spun_2025')) {
+      spinBtn.disabled = true;
+      usedMsg.textContent = "🎄 Вы уже крутили рулетку в этом году! Подарок уже ваш 🎁";
+      const savedPrize = localStorage.getItem('prize_2025');
+      if (savedPrize) {
+        resultEl.textContent = `Ваш подарок: ${savedPrize}`;
+        resultEl.style.opacity = '1';
+      }
+    }
+
+    spinBtn.addEventListener('click', () => {
+      if (localStorage.getItem('spun_2025')) return;
+
+      const randomIndex = Math.floor(Math.random() * prizes.length);
+      const prize = prizes[randomIndex];
+
+      // Вращение: 5–9 оборотов + точный угол
+      const baseRotation = 360 * (5 + Math.floor(Math.random() * 5));
+      const sectorAngle = 360 / prizes.length;
+      const targetAngle = baseRotation + (360 - sectorAngle * (randomIndex + 0.5));
+
+      wheel.style.transform = `rotate(${targetAngle}deg)`;
+
+      spinBtn.disabled = true;
+      resultEl.style.opacity = '0';
+
+      setTimeout(() => {
+        resultEl.textContent = `🎉 Ваш подарок: ${prize}`;
+        resultEl.style.opacity = '1';
+        localStorage.setItem('spun_2025', 'true');
+        localStorage.setItem('prize_2025', prize);
+        launchFireworks();
+      }, 4000);
+    });
+
+    function launchFireworks() {
+      fireworksEl.innerHTML = '';
+      fireworksEl.style.opacity = '1';
+      const count = 16;
+      for (let i = 0; i < count; i++) {
+        setTimeout(() => {
+          const particle = document.createElement('div');
+          particle.style.position = 'absolute';
+          particle.style.width = '6px';
+          particle.style.height = '6px';
+          particle.style.borderRadius = '50%';
+          particle.style.backgroundColor = `hsl(${Math.random() * 360}, 100%, 65%)`;
+          particle.style.left = `${50 + (Math.random() - 0.5) * 100}%`;
+          particle.style.top = `${50 + (Math.random() - 0.5) * 100}%`;
+          particle.style.pointerEvents = 'none';
+          fireworksEl.appendChild(particle);
+
+          particle.animate([
+            { transform: 'scale(0) translate(0,0)', opacity: 1 },
+            { transform: `scale(${Math.random()*2+1}) translate(${(Math.random()-0.5)*180}px, ${(Math.random()-0.5)*180}px)`, opacity: 0 }
+          ], {
+            duration: 700 + Math.random() * 800,
+            easing: 'cubic-bezier(0,0.9,0.5,1)'
+          });
+        }, i * 180);
+      }
+
+      setTimeout(() => {
+        fireworksEl.style.opacity = '0';
+      }, 3500);
+    }
+  </script>
+</body>
+</html>
